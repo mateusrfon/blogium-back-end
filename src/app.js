@@ -27,6 +27,13 @@ app.get("/posts", (req, res) => {
     res.send(posts);
 });
 
+app.get("/posts/:postId", (req, res) => {
+    const id = req.params.postId;
+    const post = posts.reduce((acc, e) => e.id === parseInt(id) ? acc = e : acc, {});
+    res.send(post);
+});
+
+//START
 app.listen(4001, () => {
     console.log("On business baby.");
 });
