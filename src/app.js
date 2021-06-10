@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const posts = [
+let posts = [
     {
         id: 1,
         title: 'Hello World',
@@ -75,8 +75,32 @@ app.post("/posts/:id/comments", (req, res) => {
         author,
         content
     };
+    posts[parseInt(id) - 1].commentCount = posts[parseInt(id) - 1].commentCount + 1
     comments.push(comment);
     res.send(comment);
+});
+
+app.put("/posts/:id", (req, res) => {
+    const postId = req.params.id;
+    const { id, title, coverUrl, content, commentCount } = req.body;
+    const post = { 
+        id,
+        title,
+        coverUrl,
+        contentPreview: (content.slice(0, 55) + "...").replace("<p>", '').replace("</p>", ''),
+        content,
+        commentCount
+    };
+    const newPosts = posts.map(e => {
+        if (e.id == postId) {
+            return post;
+        } else {
+            return e;
+        }
+    });
+    console.log(newPosts);
+    posts = newPosts;
+    res.send(post);
 });
 
 //START
