@@ -1,41 +1,21 @@
 import express from "express";
 import cors from "cors";
+import fs from 'fs';
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-let posts = [
-    {
-        id: 1,
-        title: 'Hello World',
-        coverUrl: 'https://miro.medium.com/max/1024/1*OohqW5DGh9CQS4hLY5FXzA.png',
-        contentPreview: 'Esta é a estrutura de um post esperado pelo front-end',
-        content: 'Este é o conteúdo do post, o que realmente vai aparecer na página do post...',
-        commentCount: 2
-    }, {
-        id: 2,
-        title: 'Teste',
-        coverUrl: 'https://miro.medium.com/max/1024/1*OohqW5DGh9CQS4hLY5FXzA.png',
-        contentPreview: 'Esta é a estrutura de um post esperado pelo front-end',
-        content: 'Este é o conteúdo do post, o que realmente vai aparecer na página do post...',
-        commentCount: 0
-    }
-];
+let posts = [];
+let comments = [];
 
-const comments = [
-    {
-        id: 1,
-        postId: 1,
-        author: 'João',
-        content: 'Muito bom esse post! Tá de parabéns'
-      }, {
-        id: 2,
-        postId: 1,
-        author: 'Maria',
-        content: 'Como faz pra dar palmas?'
-      }
-];
+if (fs.existsSync("./server/posts.txt")) {
+    posts = JSON.parse(fs.readFileSync('./server/posts.txt'));
+};
+
+if (fs.existsSync("./server/comments.txt")) {
+    comments = JSON.parse(fs.readFileSync('./server/comments.txt'));
+};
 
 app.get("/posts", (req, res) => {
     res.send(posts);
@@ -57,6 +37,7 @@ app.post("/posts", (req, res) => {
         commentCount: 0
     };
     posts.push(post);
+    fs.writeFileSync("./server/posts.txt", JSON.stringify(posts));
     res.send(post);
 });
 
@@ -77,6 +58,8 @@ app.post("/posts/:id/comments", (req, res) => {
     };
     posts[parseInt(id) - 1].commentCount = posts[parseInt(id) - 1].commentCount + 1
     comments.push(comment);
+    fs.writeFileSync("./server/posts.txt", JSON.stringify(posts));
+    fs.writeFileSync("./server/comments.txt", JSON.stringify(comments));
     res.send(comment);
 });
 
@@ -100,6 +83,7 @@ app.put("/posts/:id", (req, res) => {
     });
     console.log(newPosts);
     posts = newPosts;
+    fs.writeFileSync("./server/posts.txt", JSON.stringify(posts));
     res.send(post);
 });
 
@@ -109,6 +93,7 @@ app.delete("/posts/:id", (req, res) => {
     for (let i = id - 1; i < posts.length; i++) {
         posts[i].id = posts[i].id - 1;
     }
+    fs.writeFileSync("./server/posts.txt", JSON.stringify(posts));
     res.send('deleted');
 });
 
