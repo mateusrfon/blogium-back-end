@@ -103,6 +103,15 @@ app.put("/posts/:id", (req, res) => {
     res.send(post);
 });
 
+app.delete("/posts/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    posts = posts.filter(e => e.id !== id);
+    for (let i = id - 1; i < posts.length; i++) {
+        posts[i].id = posts[i].id - 1;
+    }
+    res.send('deleted');
+});
+
 //START
 app.listen(4001, () => {
     console.log("On business baby.");
